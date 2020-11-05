@@ -25,19 +25,19 @@ def test_model(load):
     print("accuracy : {:f} %".format(float(correct)/float(total) * 100.0))
 
 # setting hyperparameter
-learning_rate = 0.0001
+learning_rate = 0.001
 epoches = 100
-mini_batch_size = 64
+mini_batch_size = 32
 
 img_transform = transform.Compose([
-    transform.Resize((256,256)),
+    transform.Resize((32,32)),
     transform.RandomHorizontalFlip(),
     transform.ToTensor(),
     transform.Normalize(mean = [0.485],
                         std = [0.229])
 ])
 
-network = net.CNN()
+network = net.ResNet(net.ResidualBlock)
 train_data = load_data.Load_traindata(transform=img_transform)
 train_set, val_set = torch.utils.data.random_split(train_data, [len(train_data)-1500, 1500])
 train_load = Data.DataLoader(dataset=train_set, batch_size=mini_batch_size, shuffle=True)
