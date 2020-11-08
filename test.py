@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import csv
+import torchvision.models as models
 
 import load_data
 import net
@@ -16,15 +17,16 @@ import net
 file_dir = os.getcwd()
 
 img_transform = transform.Compose([
-    transform.Resize((128,128)),
+    transform.Resize((224,224)),
     transform.ToTensor(),
-    transform.Normalize(mean = [0.5],
-                        std = [0.229])
+    transform.Normalize(mean = [0.485, 0.456, 0.406],
+                        std = [0.229, 0.224, 0.225])
 ])
 
-network = torch.load('model.pkl')
+network = torch.load('./model/model25.pkl')
+print(network)
 test_data = load_data.Load_testdata(transform=img_transform)
-test_load = Data.DataLoader(dataset=test_data, batch_size=1, shuffle=False)
+test_load = Data.DataLoader(dataset=test_data, batch_size=50, shuffle=False)
 labels = load_data.get_labels()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -39,13 +41,14 @@ def test_model():
             x = x.to(device)
             outputs = network(x)
             predict = torch.max(outputs.data, 1)[1]
-            ans.append(labels[predict])
+            # print(predict)
+            ans.extend(predict)
     return ans
 
-with open('answer.csv', 'w', newline='') as csvFile:
+with open('answer2.csv', 'w', newline='') as csvFile:
     ans = test_model()
     ids = ids = [f.split('.')[0] for f in listdir(file_dir+'/testing_data/testing_data/') if isfile(join(file_dir+'/testing_data/testing_data/', f))]
     writer = csv.writer(csvFile)
     writer.writerow(['id', 'label'])
     for i in range(len(ans)):
-        writer.writerow([ids[i], ans[i]])
+        writer.writerow([ids[i], labels[ans[i]]])
