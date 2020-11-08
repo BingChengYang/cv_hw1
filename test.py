@@ -23,10 +23,10 @@ img_transform = transform.Compose([
                         std = [0.229, 0.224, 0.225])
 ])
 
-network = torch.load('./model/model25.pkl')
+network = torch.load('./model/model.pkl')
 print(network)
 test_data = load_data.Load_testdata(transform=img_transform)
-test_load = Data.DataLoader(dataset=test_data, batch_size=50, shuffle=False)
+test_load = Data.DataLoader(dataset=test_data, batch_size=64, shuffle=True)
 labels = load_data.get_labels()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -35,19 +35,20 @@ print(device)
 
 def test_model():
     ans = []
+    ids = []
     with torch.no_grad():
         for data in test_load:
-            x = data
+            x, y = data
             x = x.to(device)
             outputs = network(x)
             predict = torch.max(outputs.data, 1)[1]
             # print(predict)
+            ids.extend(y)
             ans.extend(predict)
-    return ans
+    return ans, ids
 
 with open('answer2.csv', 'w', newline='') as csvFile:
-    ans = test_model()
-    ids = ids = [f.split('.')[0] for f in listdir(file_dir+'/testing_data/testing_data/') if isfile(join(file_dir+'/testing_data/testing_data/', f))]
+    ans, ids = test_model()
     writer = csv.writer(csvFile)
     writer.writerow(['id', 'label'])
     for i in range(len(ans)):

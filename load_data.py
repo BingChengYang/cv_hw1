@@ -70,7 +70,7 @@ class Load_testdata(Dataset):
         img = self.loader(file_dir+'/testing_data/testing_data/'+filename)
         if self.transform is not None:
             img = self.transform(img)
-        return img
+        return img, filename.split('.')[0]
 
     def __len__(self):
         return len(self.imgs)
