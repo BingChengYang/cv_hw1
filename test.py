@@ -17,16 +17,16 @@ import net
 file_dir = os.getcwd()
 
 img_transform = transform.Compose([
-    transform.Resize((224,224)),
+    transform.Resize((300,300)),
     transform.ToTensor(),
     transform.Normalize(mean = [0.485, 0.456, 0.406],
                         std = [0.229, 0.224, 0.225])
 ])
 
-network = torch.load('./model/model.pkl')
+network = torch.load('./model/model90.2.pkl')
 print(network)
 test_data = load_data.Load_testdata(transform=img_transform)
-test_load = Data.DataLoader(dataset=test_data, batch_size=64, shuffle=True)
+test_load = Data.DataLoader(dataset=test_data, batch_size=1, shuffle=False)
 labels = load_data.get_labels()
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -36,6 +36,7 @@ print(device)
 def test_model():
     ans = []
     ids = []
+    network.eval()
     with torch.no_grad():
         for data in test_load:
             x, y = data
