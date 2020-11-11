@@ -43,12 +43,11 @@ def test_model():
             x = x.to(device)
             outputs = network(x)
             predict = torch.max(outputs.data, 1)[1]
-            # print(predict)
             ids.extend(y)
             ans.extend(predict)
     return ans, ids
 
-with open('answer2.csv', 'w', newline='') as csvFile:
+with open('answer.csv', 'w', newline='') as csvFile:
     ans, ids = test_model()
     writer = csv.writer(csvFile)
     writer.writerow(['id', 'label'])
