@@ -10,12 +10,17 @@ import torch.nn as nn
 import numpy as np
 import csv
 import torchvision.models as models
+import argparse
 
 import load_data
 import net
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--test_model", default="model90.2.pkl")
 file_dir = os.getcwd()
+args = parser.parse_args()
 
+# set the testing data transform
 img_transform = transform.Compose([
     transform.Resize((300,300)),
     transform.ToTensor(),
@@ -23,16 +28,17 @@ img_transform = transform.Compose([
                         std = [0.229, 0.224, 0.225])
 ])
 
-network = torch.load('./model/model90.2.pkl')
+# load the testing model and data
+network = torch.load('./model/'+args.test_model)
 print(network)
 test_data = load_data.Load_testdata(transform=img_transform)
 test_load = Data.DataLoader(dataset=test_data, batch_size=1, shuffle=False)
 labels = load_data.get_labels()
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 network.to(device)
 print(device)
 
+# start testing the model
 def test_model():
     ans = []
     ids = []
@@ -47,6 +53,7 @@ def test_model():
             ans.extend(predict)
     return ans, ids
 
+# write the result into csv file
 with open('answer.csv', 'w', newline='') as csvFile:
     ans, ids = test_model()
     writer = csv.writer(csvFile)
